@@ -79,6 +79,13 @@ const querySellers = async (sellerFilter, options, userFilter) => {
  * @param {ObjectId} id
  * @returns {Promise<Seller>}
  */
+const getSellerByUserId = async (userId) => {
+  const seller = await Seller.findOne({userId});
+  if (!seller) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Seller not found');
+  }
+  return seller;
+};
 const getSellerById = async (id) => {
   const seller = await Seller.findById(id).populate('userId');
   if (!seller) {
@@ -129,6 +136,8 @@ const approveSellerById = async (sellerId) => {
   // Set the seller's approval status to true
   seller.isApproved = true;
   await seller.save();
+
+  await sendMessagetoSeller(sellerId , adminMessage);
   
   return seller;
 };
@@ -140,4 +149,5 @@ module.exports = {
   updateSellerById,
   deleteSellerById,
   approveSellerById,
+  getSellerByUserId
 };

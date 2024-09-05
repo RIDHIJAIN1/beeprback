@@ -4,12 +4,15 @@ const validate = require('../../middlewares/validate');
 const productValidation = require('../../validations/product.validation');
 const authMiddleware = require('../../middlewares/authMiddleware'); // Assuming you have an auth middleware
 const upload = require('../../middlewares/imageUpload');
+const auth = require('../../middlewares/auth');
+const sellerIsApproved = require('../../middlewares/sellerIsApproved');
 
 const router = express.Router();
 
 // Create a new product
 router.post(
-  '/',
+  '/', auth('seller'), sellerIsApproved,
+  auth('manageProducts'),
  authMiddleware,
   upload.fields([{ name: 'image', maxCount: 1 }]), // Ensure 'image' is correctly defined in your upload middleware
   validate(productValidation.createProduct),
@@ -19,6 +22,7 @@ router.post(
 // Get all products
 router.get(
   '/',
+  auth('getProducts'),
   authMiddleware,
   validate(productValidation.getProducts),
   productController.getProducts
@@ -27,7 +31,8 @@ router.get(
 // Get a product by ID
 router.get(
   '/:productId',
-  authMiddleware,
+  auth('getProducts'),
+
   validate(productValidation.getProduct),
   productController.getProduct
 );
@@ -35,7 +40,8 @@ router.get(
 // Update a product by ID
 router.patch(
   '/:productId',
-  authMiddleware,
+  auth('manageProducts'),
+
   validate(productValidation.updateProduct),
   productController.updateProduct
 );
@@ -43,7 +49,8 @@ router.patch(
 // Delete a product by ID
 router.delete(
   '/:productId',
-  authMiddleware,
+  auth('manageProducts'),
+
   validate(productValidation.deleteProduct),
   productController.deleteProduct
 );

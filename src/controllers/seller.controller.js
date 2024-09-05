@@ -7,7 +7,6 @@ const  sellerService  = require('../services/seller.service');
 // Create a new seller
 const createSeller = catchAsync(async (req, res) => {
   const { photoId, cannabisLicense, resellersPermit } = req.files;
-
   if (!photoId || !cannabisLicense || !resellersPermit) {
     return res.status(httpStatus.BAD_REQUEST).send({
       message: '"photoId", "cannabisLicense", and "resellersPermit" are required',
@@ -16,7 +15,7 @@ const createSeller = catchAsync(async (req, res) => {
 
   // Prepare the seller data for creation
   const sellerData = {
-    userId: req.userId, // Ensure this is set from the token
+    userId: req.user._id, // Ensure this is set from the token
     photoId: photoId[0].path,
     cannabisLicense: cannabisLicense[0].path,
     resellersPermit: resellersPermit[0].path,

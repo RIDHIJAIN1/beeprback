@@ -9,6 +9,15 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
   }
   req.user = user;
 
+   // Check if the user is a seller and if they are approved
+  //  if (user.role === 'seller' ) {
+  //   return reject(new ApiError(httpStatus.FORBIDDEN, 'You must be an approved seller to perform this action.'));
+  // }
+
+  // if (user.role === 'admin') {
+  //   return resolve(); // Admin has full access
+  // }
+
   if (requiredRights.length) {
     const userRights = roleRights.get(user.role);
     const hasRequiredRights = requiredRights.every((requiredRight) => userRights.includes(requiredRight));

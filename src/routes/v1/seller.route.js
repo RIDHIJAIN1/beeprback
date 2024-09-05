@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Route for creating a seller with image and PDF uploads
 router.post(
-  '/', authMiddleware,
+  '/', auth('seller'),
   upload.fields([{ name: 'photoId', maxCount: 1 }, { name: 'cannabisLicense', maxCount: 1 }, { name: 'resellersPermit', maxCount: 1 }]), // Use fields if you are uploading multiple files with different fields
   validate(sellerValidation.createSeller), // Validate the seller data
   sellerController.createSeller // Controller to handle the creation logic
@@ -20,6 +20,6 @@ router.get('/', sellerController.getSellers);
 router.get('/:sellerId', auth, sellerController.getSeller);
 router.patch('/:sellerId', auth, validate(sellerValidation.updateSeller), sellerController.updateSeller);
 router.delete('/:sellerId', auth, sellerController.deleteSeller);
-router.patch('/:sellerId/approve', auth, sellerController.approveSeller); // Route to approve seller
+router.patch('/:sellerId/approve', sellerController.approveSeller); // Route to approve seller
 
 module.exports = router;
