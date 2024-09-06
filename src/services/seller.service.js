@@ -30,7 +30,6 @@ const createSeller = async (sellerBody) => {
  * @returns {Promise<QueryResult>}
  */
 const querySellers = async (sellerFilter, options, userFilter) => {
-  // Use aggregate to join sellers and users
   const sellers = await Seller.aggregate([
     {
       $lookup: {
@@ -46,22 +45,23 @@ const querySellers = async (sellerFilter, options, userFilter) => {
     {
       $match: {
         ...sellerFilter,
-        ...userFilter, // Apply user filters here
+        'user.role': 'seller', // Directly check if the user role is 'seller'
+        ...userFilter, // Apply any additional user filters
       },
     },
     {
       $project: {
-        // Select the fields you want to return
+        // Specify the fields to return
         _id: 1,
+        isApproved: 1,
         photoId: 1,
         cannabisLicense: 1,
         resellersPermit: 1,
         street: 1,
+        city: 1,
         state: 1,
         zipCode: 1,
-        city: 1,
         paymentOption: 1,
-        isApproved: 1,
         user: {
           name: '$user.name',
           role: '$user.role',
@@ -69,11 +69,12 @@ const querySellers = async (sellerFilter, options, userFilter) => {
         },
       },
     },
-    // Check if options.sortBy is provided and valid
-
+    // Optionally include sorting and pagination logic here
   ]);
+
   return sellers;
 };
+
 
 /**
  * Get seller by id
