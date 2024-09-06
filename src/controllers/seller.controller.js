@@ -70,10 +70,41 @@ const deleteSeller = catchAsync(async (req, res) => {
 });
 
 // Approve a seller by ID
-const approveSeller = catchAsync(async (req, res) => {
-  const seller = await sellerService.approveSellerById(req.params.sellerId);
-  res.send(seller);
-});
+const disapproveSeller = async (req, res) => {
+  const { sellerId } = req.params;
+  const { message } = req.body; // Optional message from admin
+  
+ if(!message){
+    return res.status(400).json({ status: 'error', message:'Message is required' });
+    
+ }
+ if(!sellerId){
+    return res.status(400).json({ status: 'error', message:'sellerId is required' });
+    
+ }
+  const updatedSeller = await sellerService.disapproveSellerById(sellerId, message);
+
+  res.status(httpStatus.OK).json({
+    status: 'success',
+    adminMessage: message, // Include the admin's message in the response
+    data: updatedSeller // Include the updated seller information
+  });
+};
+
+
+const approveSeller = async (req, res) => {
+  const { sellerId } = req.params;
+
+  const updatedSeller = await sellerService.approveSellerById(sellerId);
+
+  res.status(httpStatus.OK).json({
+    status: 'success',
+    data: updatedSeller // Include the updated seller information
+  });
+};
+
+
+
 
 module.exports = {
   createSeller,
@@ -82,4 +113,5 @@ module.exports = {
   updateSeller,
   deleteSeller,
   approveSeller,
+  disapproveSeller
 };

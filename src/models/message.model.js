@@ -8,11 +8,7 @@ const messageSchema = mongoose.Schema(
       required: true,
       ref: 'Seller', // Assuming you have a Seller model
     },
-    adminId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'Admin', // Assuming you have an Admin model
-    },
+  
     message: {
       type: String,
       required: true,

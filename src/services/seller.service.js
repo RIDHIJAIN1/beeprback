@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const  Seller  = require('../models/seller.model');
 const { User } = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
+const Message = require('../models/message.model')
 
 /**
  * Create a seller
@@ -129,18 +130,61 @@ const deleteSellerById = async (sellerId) => {
  */
 const approveSellerById = async (sellerId) => {
   const seller = await getSellerById(sellerId);
+
   if (!seller) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Seller not found');
   }
-  
-  // Set the seller's approval status to true
-  seller.isApproved = true;
-  await seller.save();
+    seller.isApproved = true;
+    await seller.save();
 
-  await sendMessagetoSeller(sellerId , adminMessage);
+   
+  
+
+  return seller;
+
+};
+
+const disapproveSellerById = async (sellerId, adminMessage) => {
+  const seller = await getSellerById(sellerId);
+  if (!seller) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Seller not found');
+  }
+
+  if(!adminMessage){
+    throw new ApiError(httpStatus.NOT_FOUND, 'Message not found');
+  }
+  
+  // Disapprove the seller
+  seller.isApproved = false;
+  await seller.save();
+  
+  // Send the disapproval message to the seller
+  await sendMessageToSeller(sellerId, adminMessage);
   
   return seller;
 };
+
+
+
+
+const sendMessageToSeller = async (sellerId, message) => {
+  const seller = await getSellerById(sellerId);
+  
+  if (!seller) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Seller not found');
+  }
+
+  // Store the message in the database
+  const newMessage = new Message({
+    sellerId: seller._id,// The admin sending the message
+    message,
+  });
+
+  await newMessage.save();
+  console.log(`Message stored in DB for seller (${seller._id}): ${message}`);
+};
+
+
 
 module.exports = {
   createSeller,
@@ -149,5 +193,7 @@ module.exports = {
   updateSellerById,
   deleteSellerById,
   approveSellerById,
+  disapproveSellerById,
+  sendMessageToSeller,
   getSellerByUserId
 };
