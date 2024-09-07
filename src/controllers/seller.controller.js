@@ -32,6 +32,22 @@ const createSeller = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(seller);
 });
 
+const getProductCountBySeller = catchAsync(async (req, res) => {
+  const { sellerId } = req.params; // Assuming sellerId is passed as a route parameter
+
+  try {
+    if (!sellerId) {
+      throw new Error('Seller ID is required');
+    }
+
+    const productCount = await sellerService.countProductsBySeller(sellerId);
+    res.status(200).send({ sellerId, productCount });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
+
+
 
 // Get all sellers
 const getSellers = catchAsync(async (req, res) => {
@@ -46,7 +62,7 @@ const getSellers = catchAsync(async (req, res) => {
   const sellerFilter = {}; // You can add other seller-specific filters here
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
 
-  if (!options.sortBy) {
+    if (!options.sortBy) {
     options.sortBy = 'createdAt:desc';
   }
   
@@ -119,5 +135,6 @@ module.exports = {
   updateSeller,
   deleteSeller,
   approveSeller,
-  disapproveSeller
+  disapproveSeller,
+  getProductCountBySeller
 };

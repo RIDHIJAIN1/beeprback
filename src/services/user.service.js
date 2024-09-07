@@ -1,6 +1,8 @@
 const httpStatus = require('http-status');
 const { User } = require('../models');
+// const  Product } = require('../models/product.model');
 const ApiError = require('../utils/ApiError');
+const Product = require('../models/product.model');
 
 /**
  * Create a user
@@ -36,6 +38,24 @@ const queryUsers = async (filter, options) => {
 const getUserById = async (id) => {
   return User.findById(id);
 };
+
+const countProduct = async()=>{
+  return Product.countDocuments();
+}
+
+const countUsers = async (role) => {
+  if (!role) {
+    throw new Error('Role is not provided');
+  }
+
+  // Query the User collection and count users with the specific role
+  const count = await User.countDocuments({ role });
+  
+  return count;
+};
+
+
+
 
 /**
  * Get user by email
@@ -86,4 +106,7 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  countUsers,
+  countProduct,
+  
 };

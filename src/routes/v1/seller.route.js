@@ -16,6 +16,7 @@ router.post(
 
 // Optionally, you can add more routes for getting, updating, deleting sellers, etc.
 router.get('/', auth('sellersForAdmin'), sellerController.getSellers);
+router.get('/products/count/:sellerId', sellerController.getProductCountBySeller);
 router.get('/:sellerId', auth('sellersForAdmin'), sellerController.getSeller);
 router.patch('/:sellerId', auth('sellersForAdmin'), validate(sellerValidation.updateSeller), sellerController.updateSeller);
 router.delete('/:sellerId', auth("sellersForAdmin"), sellerController.deleteSeller);

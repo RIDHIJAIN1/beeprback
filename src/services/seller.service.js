@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const  Seller  = require('../models/seller.model');
+const  Product = require('../models/product.model');
 const { User } = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 const Message = require('../models/message.model')
@@ -172,6 +173,18 @@ const disapproveSellerById = async (sellerId, adminMessage) => {
   return seller;
 };
 
+const countProductsBySeller = async (sellerId) => {
+  if (!sellerId) {
+    throw new Error('Seller ID is not provided');
+  }
+
+  try {
+    return await Product.countDocuments({ sellerId });
+  } catch (error) {
+    throw new Error(`Error counting products for seller ${sellerId}: ${error.message}`);
+  }
+};
+
 
 
 
@@ -203,5 +216,6 @@ module.exports = {
   approveSellerById,
   disapproveSellerById,
   sendMessageToSeller,
-  getSellerByUserId
+  getSellerByUserId,
+  countProductsBySeller
 };

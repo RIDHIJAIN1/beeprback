@@ -3,6 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
+const { productService } = require('../services/product.service');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -40,10 +41,25 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const countUsersByRole = catchAsync(async (req, res) => {
+  const userCount = await userService.countUsers('user');
+  const sellerCount = await userService.countUsers('seller');
+  const adminCount = await userService.countUsers('admin');
+  const productCount = await userService.countProduct();
+
+  return res.status(httpStatus.OK).json({
+    userCount,
+    sellerCount,
+    adminCount,
+    productCount
+  });
+});
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  countUsersByRole
 };

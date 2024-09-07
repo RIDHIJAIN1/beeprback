@@ -20,7 +20,7 @@ const createSeller = {
 
 const getSellers = {
   query: Joi.object().keys({
-    sortBy: Joi.string(),
+    sortBy: Joi.string().valid('createdAt', '-createdAt'),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
     sellerId: Joi.string().hex().length(24), // Assuming sellerId is a 24-char hexadecimal string
