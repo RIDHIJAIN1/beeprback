@@ -19,7 +19,7 @@ const createCategory = async (categoryBody) => {
  */
 const queryCategories = async (filter, options) => {
   // Modify the filter to exclude soft-deleted categories
-  const categories = await Category.find(filter,options)
+  const categories = await Category.find(filter, null, options).sort({ createdAt: -1 });
   return categories;
 };
 

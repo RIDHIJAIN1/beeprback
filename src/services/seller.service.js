@@ -30,6 +30,7 @@ const createSeller = async (sellerBody) => {
  * @returns {Promise<QueryResult>}
  */
 const querySellers = async (sellerFilter, options, userFilter) => {
+  options.sort = { createdAt: -1 };
   const sellers = await Seller.aggregate([
     {
       $lookup: {

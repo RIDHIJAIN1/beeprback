@@ -30,7 +30,7 @@ const getProducts = {
     category: Joi.string(),
     sellerId: Joi.string().custom(objectId),
     id: Joi.string().custom(objectId), // Optional filter by seller ID
-    sortBy: Joi.string(),
+  
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
   }),

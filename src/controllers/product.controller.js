@@ -21,7 +21,8 @@ const createProduct = catchAsync(async (req, res) => {
     weight: req.body.weight,
     description: req.body.description,
     categoryId: req.body.categoryId,
-    sellerId: req.userId, // Ensure this is set from the token
+    sellerId: req.userId, 
+    // Ensure this is set from the token
     // reviews: req.body.reviews || [], // Optional reviews
   };
 
@@ -47,6 +48,10 @@ const getProducts = catchAsync(async (req, res) => {
   }
 
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
+
+  if (!options.sortBy) {
+    options.sortBy = 'createdAt:desc';
+  }
   const products = await productService.queryProducts(filter, options);
   res.send(products);
 });

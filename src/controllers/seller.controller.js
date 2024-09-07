@@ -45,6 +45,10 @@ const getSellers = catchAsync(async (req, res) => {
 
   const sellerFilter = {}; // You can add other seller-specific filters here
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
+
+  if (!options.sortBy) {
+    options.sortBy = 'createdAt:desc';
+  }
   
   const sellers = await sellerService.querySellers(sellerFilter, options, userFilter);
   res.send(sellers);
