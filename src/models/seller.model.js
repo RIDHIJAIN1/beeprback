@@ -46,8 +46,9 @@ const sellerSchema = mongoose.Schema(
       required: true,
     },
     isApproved: {
-      type: Boolean,
-      default: false, // Default to false until approved by admin
+      type: String,
+      enum: ['pending', 'rejected', 'approved'],
+      default: 'pending', // Default to 'pending' until reviewed
     },
   },
   {

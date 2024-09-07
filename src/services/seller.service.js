@@ -131,19 +131,22 @@ const deleteSellerById = async (sellerId) => {
  * @returns {Promise<Seller>}
  */
 const approveSellerById = async (sellerId) => {
-  const seller = await getSellerById(sellerId);
+  const seller = await Seller.findById(sellerId);
 
   if (!seller) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Seller not found');
   }
-    seller.isApproved = true;
-    await seller.save();
 
-   
-  
+  // Check current approval status
+  if (seller.isApproved === 'approved') {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Seller is already approved');
+  }
+
+  // Update the approval status
+  seller.isApproved = 'approved';
+  await seller.save();
 
   return seller;
-
 };
 
 const disapproveSellerById = async (sellerId, adminMessage) => {
@@ -153,13 +156,16 @@ const disapproveSellerById = async (sellerId, adminMessage) => {
   }
 
   if(!adminMessage){
-    throw new ApiError(httpStatus.NOT_FOUND, 'Message not found');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Message not found');
   }
   
-  // Disapprove the seller
-  seller.isApproved = false;
+  if (seller.isApproved === 'rejected') {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Seller is already rejected');
+  }
+
+  // Update the approval status
+  seller.isApproved = 'rejected';
   await seller.save();
-  
   // Send the disapproval message to the seller
   await sendMessageToSeller(sellerId, adminMessage);
   
