@@ -16,11 +16,11 @@ router.post(
 );
 
 // Optionally, you can add more routes for getting, updating, deleting sellers, etc.
-router.get('/', sellerController.getSellers);
+router.get('/', auth, sellerController.getSellers);
 router.get('/:sellerId', auth, sellerController.getSeller);
 router.patch('/:sellerId', auth, validate(sellerValidation.updateSeller), sellerController.updateSeller);
 router.delete('/:sellerId', auth, sellerController.deleteSeller);
-router.patch('/:sellerId/approve',auth('approveseller'), sellerController.approveSeller); // Route to approve seller
-router.patch('/:sellerId/disapprove',auth('approveseller'), sellerController.disapproveSeller); // Route to approve seller
+router.patch('/:sellerId/approve', auth('approveseller'), sellerController.approveSeller); // Route to approve seller
+router.patch('/:sellerId/disapprove', auth('approveseller'), sellerController.disapproveSeller); // Route to approve seller
 
 module.exports = router;
