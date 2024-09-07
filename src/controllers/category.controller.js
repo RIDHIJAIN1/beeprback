@@ -30,10 +30,10 @@ const updateCategory = catchAsync(async (req, res) => {
   res.send(category);
 });
 
-// Soft delete a category by ID
+// Toggle category status
 const statusChangeCategory = catchAsync(async (req, res) => {
   await categoryService.statusChangeById(req.params.categoryId);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send({message:"Status changed successfully!"});
 });
 
 module.exports = {

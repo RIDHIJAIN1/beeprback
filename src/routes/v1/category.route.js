@@ -14,10 +14,10 @@ router.get('/', categoryController.getCategories);
 // Get a category by ID
 router.get('/:categoryId', categoryController.getCategory);
 
+// Toggle the status of category
+router.patch('/:categoryId/status', categoryController.statusChangeCategory); // Use soft delete instead of delete
+
 // Update a category by ID
 router.patch('/:categoryId', validate(categoryValidation.updateCategory), categoryController.updateCategory);
-
-// Soft delete a category by ID
-router.patch('/:categoryId/status', categoryController.statusChangeCategory); // Use soft delete instead of delete
 
 module.exports = router;
