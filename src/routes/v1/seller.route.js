@@ -4,7 +4,6 @@ const validate = require('../../middlewares/validate');
 const sellerValidation = require('../../validations/seller.validation');
 const sellerController = require('../../controllers/seller.controller');
 const upload = require('../../middlewares/imageUpload'); // Import your image upload middleware
-const authMiddleware = require('../../middlewares/authMiddleware');
 const router = express.Router();
 
 // Route for creating a seller with image and PDF uploads
@@ -16,11 +15,11 @@ router.post(
 );
 
 // Optionally, you can add more routes for getting, updating, deleting sellers, etc.
-router.get('/', auth, sellerController.getSellers);
-router.get('/:sellerId', auth, sellerController.getSeller);
-router.patch('/:sellerId', auth, validate(sellerValidation.updateSeller), sellerController.updateSeller);
-router.delete('/:sellerId', auth, sellerController.deleteSeller);
-router.patch('/:sellerId/approve', auth('approveseller'), sellerController.approveSeller); // Route to approve seller
-router.patch('/:sellerId/disapprove', auth('approveseller'), sellerController.disapproveSeller); // Route to approve seller
+router.get('/', auth('sellersForAdmin'), sellerController.getSellers);
+router.get('/:sellerId', auth('sellersForAdmin'), sellerController.getSeller);
+router.patch('/:sellerId', auth('sellersForAdmin'), validate(sellerValidation.updateSeller), sellerController.updateSeller);
+router.delete('/:sellerId', auth("sellersForAdmin"), sellerController.deleteSeller);
+router.patch('/:sellerId/approve', auth('sellersForAdmin'), sellerController.approveSeller); // Route to approve seller
+router.patch('/:sellerId/disapprove', auth('sellersForAdmin'), sellerController.disapproveSeller); // Route to approve seller
 
 module.exports = router;

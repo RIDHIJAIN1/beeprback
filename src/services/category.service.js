@@ -19,7 +19,7 @@ const createCategory = async (categoryBody) => {
  */
 const queryCategories = async (filter, options) => {
   // Modify the filter to exclude soft-deleted categories
-  const categories = await Category.find({ deleted: false, ...filter }, null, options);
+  const categories = await Category.find(filter,options)
   return categories;
 };
 
@@ -29,7 +29,7 @@ const queryCategories = async (filter, options) => {
  * @returns {Promise<Category>}
  */
 const getCategoryById = async (id) => {
-  return Category.findOne({ _id: id, deleted: false }); // Ensure we only get non-deleted categories
+  return Category.findOne({ _id: id, }); // Ensure we only get non-deleted categories
 };
 
 /**
@@ -53,12 +53,12 @@ const updateCategoryById = async (categoryId, updateBody) => {
  * @param {ObjectId} categoryId
  * @returns {Promise<Category>}
  */
-const softDeleteCategoryById = async (categoryId) => {
+const statusChangeById = async (categoryId) => {
   const category = await getCategoryById(categoryId);
   if (!category) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Category not found');
   }
-  category.deleted = true; // Mark as deleted
+  category.status = !category.status 
   await category.save();
   return category;
 };
@@ -68,5 +68,5 @@ module.exports = {
   queryCategories,
   getCategoryById,
   updateCategoryById,
-  softDeleteCategoryById, // Export the soft delete function
+  statusChangeById, // Export the soft delete function
 };

@@ -40,12 +40,19 @@ const queryProducts = async (filter, options) => {
  * @param {ObjectId} id
  * @returns {Promise<Product>}
  */
+// const getProductById = async (id) => {
+//   const product = await Product.findById(id);
+//   if (!product) {
+//     throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+//   }
+//   return product;
+// };
+
+const getProductsBySellerId = async (sellerId) => {
+  return Product.find({ sellerId });
+};
 const getProductById = async (id) => {
-  const product = await Product.findById(id);
-  if (!product) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
-  }
-  return product;
+  return Product.find({ id });
 };
 
 /**
@@ -83,4 +90,5 @@ module.exports = {
   getProductById,
   updateProductById,
   deleteProductById,
+  getProductsBySellerId
 };

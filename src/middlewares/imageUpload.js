@@ -1,10 +1,12 @@
 const multer = require('multer');
 const path = require('path');
 
-// Define storage for the uploads
+// Define storage for the uploads using an absolute path
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads'); // Specify the uploads folder
+    // Resolve the uploads folder relative to the root of the project
+    const uploadPath = path.resolve(__dirname, '../../uploads');
+    cb(null, uploadPath); // Use the resolved path for the uploads folder
   },
   filename: (req, file, cb) => {
     // Create a unique filename with the original extension

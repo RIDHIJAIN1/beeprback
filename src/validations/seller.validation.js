@@ -23,6 +23,8 @@ const getSellers = {
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
+    sellerId: Joi.string().hex().length(24), // Assuming sellerId is a 24-char hexadecimal string
+   
   }),
 };
 

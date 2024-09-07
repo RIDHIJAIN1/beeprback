@@ -28,7 +28,8 @@ const getProducts = {
   query: Joi.object().keys({
     title: Joi.string(),
     category: Joi.string(),
-    sellerId: Joi.string().custom(objectId), // Optional filter by seller ID
+    sellerId: Joi.string().custom(objectId),
+    id: Joi.string().custom(objectId), // Optional filter by seller ID
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -37,8 +38,9 @@ const getProducts = {
 
 const getProduct = {
   params: Joi.object().keys({
-    productId: Joi.string().custom(objectId),
-  }),
+     id: Joi.string().custom(objectId).optional(), // Optional productId
+    sellerId: Joi.string().custom(objectId).optional(),  // Optional sellerId
+  }).or('productId', 'sellerId')
 };
 
 const updateProduct = {

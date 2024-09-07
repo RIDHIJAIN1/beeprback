@@ -9,9 +9,9 @@ const categorySchema = mongoose.Schema(
       trim: true,
       unique: true,
     },
-    deleted: {
+    status: {
       type: Boolean,
-      default: false, // Indicates whether the category is "deleted"
+      default: true, // Indicates whether the category is "deleted"
     },
   },
   {

@@ -28,14 +28,14 @@ router.get(
   productController.getProducts
 );
 
-// Get a product by ID
 router.get(
-  '/:productId',
+  '/',  // Keep the path simple since query parameters will be used
   auth('getProducts'),
-
-  validate(productValidation.getProduct),
+  validate(productValidation.getProducts),  // Ensure validation accepts productId or sellerId
   productController.getProduct
 );
+
+
 
 // Update a product by ID
 router.patch(

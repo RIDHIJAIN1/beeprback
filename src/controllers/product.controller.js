@@ -38,6 +38,10 @@ const getProducts = catchAsync(async (req, res) => {
   if (req.query.category) {
     filter.category = req.query.category;
   }
+
+  if (req.query.id) {
+    filter._id = req.query.id; // MongoDB uses `_id` for document IDs
+  }
   if (req.query.sellerId) {
     filter.sellerId = req.query.sellerId;
   }
@@ -48,13 +52,26 @@ const getProducts = catchAsync(async (req, res) => {
 });
 
 // Get a product by ID
+// Get a product by productId or sellerId
 const getProduct = catchAsync(async (req, res) => {
-  const product = await productService.getProductById(req.params.productId);
+  const { productId, sellerId } = req.query;
+
+  let product;
+  if (productId) {
+    product = await productService.getProductById(productId); // Query by productId
+  } else if (sellerId) {
+    product = await productService.getProductsBySellerId(sellerId); // Query by sellerId
+  } else {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Either productId or sellerId is required');
+  }
+
   if (!product) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
   }
+
   res.send(product);
 });
+
 
 // Update a product by ID
 const updateProduct = catchAsync(async (req, res) => {

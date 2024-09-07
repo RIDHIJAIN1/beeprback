@@ -31,8 +31,8 @@ const updateCategory = catchAsync(async (req, res) => {
 });
 
 // Soft delete a category by ID
-const softDeleteCategory = catchAsync(async (req, res) => {
-  await categoryService.softDeleteCategoryById(req.params.categoryId);
+const statusChangeCategory = catchAsync(async (req, res) => {
+  await categoryService.statusChangeById(req.params.categoryId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -41,5 +41,5 @@ module.exports = {
   getCategories,
   getCategory,
   updateCategory,
-  softDeleteCategory, // Export the soft delete function
+  statusChangeCategory, // Export the soft delete function
 };
