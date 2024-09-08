@@ -13,14 +13,7 @@ const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   let user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
-  if (user.role == "seller") {
-    const seller = await Seller.findOne({ userId: user._id });
-    if (!seller)
-      return res.send({ user, seller: null, tokens });
-    else
-      return res.send({ user, seller, tokens });
-  }
-  return res.send({ user, tokens });
+  res.send({ user, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
@@ -52,7 +45,14 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
 
 const getUserFromToken = catchAsync(async (req, res) => {
   // Extract the user from token
-  res.status(httpStatus.OK).send(req.user);
+  if (req.user.role == "seller") {
+    const seller = await Seller.findOne({ userId: req.user._id });
+    if (!seller)
+      return res.status(httpStatus.OK).send(req.user);
+    else
+      return res.status(httpStatus.OK).send({ ...req.user._doc, ...seller._doc });
+  }
+  return res.status(httpStatus.OK).send(req.user);
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
