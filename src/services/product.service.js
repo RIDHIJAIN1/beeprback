@@ -53,7 +53,7 @@ const getProductsBySellerId = async (sellerId) => {
   return Product.find({ sellerId });
 };
 const getProductById = async (id) => {
-  return Product.find({ id });
+  return Product.findById(id);
 };
 
 /**
@@ -82,7 +82,6 @@ const deleteProductById = async (productId) => {
       throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
     }
     product.deleted = true; // Mark as deleted
-    await product.save();
     return product;
   };
 module.exports = {

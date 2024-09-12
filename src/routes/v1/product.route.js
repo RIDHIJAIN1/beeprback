@@ -11,9 +11,9 @@ const router = express.Router();
 
 // Create a new product
 router.post(
-  '/', auth('seller'), sellerIsApproved,
+  '/', auth('seller'), 
   auth('manageProducts'),
- authMiddleware,
+  sellerIsApproved,
   upload.fields([{ name: 'image', maxCount: 1 }]), // Ensure 'image' is correctly defined in your upload middleware
   validate(productValidation.createProduct),
   productController.createProduct
@@ -40,8 +40,9 @@ router.get(
 // Update a product by ID
 router.patch(
   '/:productId',
-  auth('manageProducts'),
-
+  auth('manageProducts'), 
+  sellerIsApproved,
+  upload.fields([{ name: 'image', maxCount: 1 }]),
   validate(productValidation.updateProduct),
   productController.updateProduct
 );

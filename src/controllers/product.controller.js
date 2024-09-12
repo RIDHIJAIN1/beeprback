@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const productService = require('../services/product.service');
 const Category = require('../models/category.model');
+const path = require('path');
 // Create a new product
 const createProduct = catchAsync(async (req, res) => {
   const { image } = req.files; // Assuming image is uploaded via files
@@ -24,7 +25,7 @@ const createProduct = catchAsync(async (req, res) => {
 
   // Prepare the product data for creation
   const productData = {
-    image: image[0].path, // Assuming image is stored in the path
+    image: path.join('uploads', path.basename(image[0].path)), // Assuming image is stored in the path
     title: req.body.title,
     deliveryOption: req.body.deliveryOption,
     weight: req.body.weight,

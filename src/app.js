@@ -15,9 +15,11 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const path = require('path');
 const app = express();
+const bodyParser = require('body-parser');
 
 
-
+app.use(bodyParser.json({ limit: '50mb' })); // Increase limit as needed
+// app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // Serve the uploads folder statically
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 

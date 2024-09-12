@@ -3,10 +3,12 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const  sellerService  = require('../services/seller.service');
+const path = require('path');
 
 // Create a new seller
 const createSeller = catchAsync(async (req, res) => {
   const { photoId, cannabisLicense, resellersPermit } = req.files;
+  
   if (!photoId || !cannabisLicense || !resellersPermit) {
     return res.status(httpStatus.BAD_REQUEST).send({
       message: '"photoId", "cannabisLicense", and "resellersPermit" are required',
@@ -16,9 +18,10 @@ const createSeller = catchAsync(async (req, res) => {
   // Prepare the seller data for creation
   const sellerData = {
     userId: req.user._id, // Ensure this is set from the token
-    photoId: photoId[0].path,
-    cannabisLicense: cannabisLicense[0].path,
-    resellersPermit: resellersPermit[0].path,
+
+    photoId: path.join('uploads', path.basename(photoId[0].path)),
+    cannabisLicense: path.join('uploads', path.basename(cannabisLicense[0].path)),
+    resellersPermit: path.join('uploads', path.basename(resellersPermit[0].path)),
     street: req.body.street,
     city: req.body.city,
     state: req.body.state,
@@ -94,21 +97,34 @@ const deleteSeller = catchAsync(async (req, res) => {
 // Approve a seller by ID
 const disapproveSeller = async (req, res) => {
   const { sellerId } = req.params;
-  const { message } = req.body; // Optional message from admin
-  
- if(!message){
-    return res.status(400).json({ status: 'error', message:'Message is required' });
-    
- }
- if(!sellerId){
-    return res.status(400).json({ status: 'error', message:'sellerId is required' });
-    
- }
-  const updatedSeller = await sellerService.disapproveSellerById(sellerId, message);
+  const { message } = req.body; // New message from admin
+
+  if (!message) {
+    return res.status(400).json({ status: 'error', message: 'Message is required' });
+  }
+
+  if (!sellerId) {
+    return res.status(400).json({ status: 'error', message: 'sellerId is required' });
+  }
+
+  const currentSeller = await sellerService.getSellerById(sellerId);
+
+  if (!currentSeller) {
+    return res.status(404).json({ status: 'error', message: 'Seller not found' });
+  }
+
+  // Check if the seller is already disapproved
+  if (currentSeller.isApproved !== 'rejected') {
+    return res.status(400).json({ status: 'error', message: 'Seller is not disapproved yet' });
+  }
+
+  // Update the disapproval message
+  currentSeller.message = message; // Update the message with the new one
+  const updatedSeller = await currentSeller.save(); // Save the updated seller information
 
   res.status(httpStatus.OK).json({
     status: 'success',
-    adminMessage: message, // Include the admin's message in the response
+    adminMessage: message, // Include the updated admin message in the response
     data: updatedSeller // Include the updated seller information
   });
 };

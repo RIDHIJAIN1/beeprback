@@ -3,6 +3,7 @@ const { objectId } = require('./custom.validation');
 
 const createSeller = {
   body: Joi.object().keys({
+    name: Joi.string().required(),
     street: Joi.string().required(),
     city: Joi.string().required(),
     state: Joi.string().required(),

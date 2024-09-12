@@ -54,7 +54,7 @@ const updateProduct = {
       deliveryOption: Joi.string().valid('standard', 'express', 'overnight'), // Example delivery options
       weight: Joi.number().min(0),
       description: Joi.string(),
-      category: Joi.string(),
+      categoryId: Joi.string(),
       sellerId: Joi.string().custom(objectId), // Optional to update seller ID
       reviews: Joi.array().items(
         Joi.object().keys({
