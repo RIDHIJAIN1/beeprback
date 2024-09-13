@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 const Seller = require('../models/seller.model');
+const Message = require('../models/message.model');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -45,12 +46,20 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
 
 const getUserFromToken = catchAsync(async (req, res) => {
   // Extract the user from token
-  if (req.user.role == "seller") {
+  if (req.user.role == 'seller') {
     const seller = await Seller.findOne({ userId: req.user._id });
-    if (!seller)
+    // console.log("\n\n")
+    // console.log(seller)
+    // console.log("\n\n")
+    if (!seller) {
       return res.status(httpStatus.OK).send(req.user);
-    else
+    } else {
+      const message = await Message.findOne({ sellerId: seller._id });
+      if (message) {
+        return res.status(httpStatus.OK).send({ ...req.user._doc, ...seller._doc, ...message._doc });
+      }
       return res.status(httpStatus.OK).send({ ...req.user._doc, ...seller._doc });
+    }
   }
   return res.status(httpStatus.OK).send(req.user);
 });

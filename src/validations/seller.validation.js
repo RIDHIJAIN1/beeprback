@@ -35,37 +35,21 @@ const getSeller = {
   }),
 };
 
-const updateSeller = {
-  params: Joi.object().keys({
-    sellerId: Joi.string().custom(objectId).required(),
+const updateSellerById = {
+  body: Joi.object().keys({
+    name: Joi.string().optional(),
+    street: Joi.string().required(),
+    city: Joi.string().required(),
+    state: Joi.string().required(),
+    zipCode: Joi.string().required(),
+    country: Joi.string().required(),
+    paymentOption: Joi.string().required(),
   }),
-  body: Joi.object()
-    .keys({
-      responsibleManagingParty: Joi.object().keys({
-        photoId: Joi.string(), // Optional for update
-      }),
-      licenses: Joi.object().keys({
-        cannabisLicense: Joi.string(), // Optional for update
-        resellersPermit: Joi.string(), // Optional for update
-      }),
-      billingAddress: Joi.object().keys({
-        street: Joi.string(),
-        city: Joi.string(),
-        state: Joi.string(),
-        zipCode: Joi.string(),
-        country: Joi.string(),
-      }),
-      paymentOption: Joi.object().keys({
-        method: Joi.string(),
-        details: Joi.object().keys({
-          cardNumber: Joi.string(), // Optional for update
-          expirationDate: Joi.string(), // Optional for update
-          cvv: Joi.string(), // Optional for update
-          paypalEmail: Joi.string(), // Optional for update
-        }),
-      }),
-    })
-    .min(1), // At least one field must be present for update
+  files: Joi.object().keys({
+    photoId: Joi.object().optional(),
+    cannabisLicense: Joi.object().optional(),
+    resellersPermit: Joi.object().optional(),
+  }).optional().allow(null),
 };
 
 const deleteSeller = {
@@ -78,7 +62,7 @@ module.exports = {
   createSeller,
   getSellers,
   getSeller,
-  updateSeller,
+  updateSellerById,
   deleteSeller,
   
 };

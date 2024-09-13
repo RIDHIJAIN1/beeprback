@@ -18,7 +18,12 @@ router.post(
 router.get('/', auth('sellersForAdmin'), sellerController.getSellers);
 router.get('/products/count/:sellerId', sellerController.getProductCountBySeller);
 router.get('/:sellerId', auth('sellersForAdmin'), sellerController.getSeller);
-router.patch('/:sellerId', auth('sellersForAdmin'), validate(sellerValidation.updateSeller), sellerController.updateSeller);
+router.patch(
+  '/:sellerId', auth('seller'), 
+  upload.fields([{ name: 'photoId', maxCount: 1 }, { name: 'cannabisLicense', maxCount: 1 }, { name: 'resellersPermit', maxCount: 1 }]), // Use fields if you are uploading multiple files with different fields
+  validate(sellerValidation.updateSellerById), 
+  sellerController.updateSeller
+);
 router.delete('/:sellerId', auth("sellersForAdmin"), sellerController.deleteSeller);
 router.patch('/:sellerId/approve', auth('sellersForAdmin'), sellerController.approveSeller); // Route to approve seller
 router.patch('/:sellerId/disapprove', auth('sellersForAdmin'), sellerController.disapproveSeller); // Route to approve seller

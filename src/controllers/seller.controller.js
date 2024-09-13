@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const  sellerService  = require('../services/seller.service');
 const path = require('path');
+const Message = require('../models/message.model');
 
 // Create a new seller
 const createSeller = catchAsync(async (req, res) => {
@@ -133,12 +134,26 @@ const disapproveSeller = async (req, res) => {
 const approveSeller = async (req, res) => {
   const { sellerId } = req.params;
 
-  const updatedSeller = await sellerService.approveSellerById(sellerId);
+  try {
+    // Delete existing messages for the sellerId
+    await Message.deleteMany({ sellerId });
 
-  res.status(httpStatus.OK).json({
-    status: 'success',
-    data: updatedSeller // Include the updated seller information
-  });
+    // Approve the seller
+    const updatedSeller = await sellerService.approveSellerById(sellerId);
+
+    // Send the response
+    res.status(httpStatus.OK).json({
+      status: 'success',
+      data: updatedSeller // Include the updated seller information
+    });
+  } catch (error) {
+    // Handle errors (e.g., log the error, send a response)
+    console.error(error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      status: 'error',
+      message: 'An error occurred while approving the seller.'
+    });
+  }
 };
 
 

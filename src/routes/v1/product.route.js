@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Create a new product
 router.post(
-  '/', auth('seller'), 
+  '/',
   auth('manageProducts'),
   sellerIsApproved,
   upload.fields([{ name: 'image', maxCount: 1 }]), // Ensure 'image' is correctly defined in your upload middleware
@@ -51,7 +51,6 @@ router.patch(
 router.delete(
   '/:productId',
   auth('manageProducts'),
-
   validate(productValidation.deleteProduct),
   productController.deleteProduct
 );
