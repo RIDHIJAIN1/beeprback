@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const categoryService = require('../services/category.service');
 const ApiError = require('../utils/ApiError');
+const pick = require('../utils/pick');
 
 // Create a new category
 const createCategory = catchAsync(async (req, res) => {
@@ -11,7 +12,17 @@ const createCategory = catchAsync(async (req, res) => {
 
 // Get all categories
 const getCategories = catchAsync(async (req, res) => {
-  const categories = await categoryService.queryCategories({}, {});
+  const filter = {}
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+
+    if (req.query.id) {
+    filter._id = req.query.id; // MongoDB uses `_id` for document IDs
+  }
+
+  if (!options.sortBy) {
+    options.sortBy = 'createdAt:desc';
+  }
+  const categories = await categoryService.queryCategories(filter,options);
   res.send(categories);
 });
 

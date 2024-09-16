@@ -31,7 +31,39 @@ const createSeller = async (sellerBody) => {
  * @returns {Promise<QueryResult>}
  */
 const querySellers = async (sellerFilter, options, userFilter) => {
-  options.sort = { createdAt: -1 };
+  // Count total sellers matching the filters
+  const totalSellersCount = await Seller.aggregate([
+    {
+      $lookup: {
+        from: 'users', // The name of the user collection
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user', // Unwind the user array to get individual user documents
+    },
+    {
+      $match: {
+        ...sellerFilter,
+        'user.role': 'seller', // Directly check if the user role is 'seller'
+        ...userFilter, // Apply any additional user filters
+      },
+    },
+    {
+      $count: 'total', // Count the total number of sellers
+    },
+  ]);
+
+  const totalResults = totalSellersCount.length > 0 ? totalSellersCount[0].total : 0; // Get total count
+
+  // Set pagination options
+  const limit = options.limit ? parseInt(options.limit) : 10; // Default limit
+  const page = options.page ? parseInt(options.page) : 1; // Default page
+  const skip = (page - 1) * limit; // Calculate skip value
+
+  // Fetch paginated sellers
   const sellers = await Seller.aggregate([
     {
       $lookup: {
@@ -71,10 +103,23 @@ const querySellers = async (sellerFilter, options, userFilter) => {
         },
       },
     },
-    // Optionally include sorting and pagination logic here
+    {
+      $sort: { createdAt: -1 }, // Sort sellers by createdAt descending
+    },
+    {
+      $skip: skip, // Skip the calculated number of documents
+    },
+    {
+      $limit: limit, // Limit the results
+    },
   ]);
 
-  return sellers;
+  // Return the total count and the sellers
+  return {
+    totalResults,
+    sellers,
+    totalPages: Math.ceil(totalResults / limit), // Calculate total pages
+  };
 };
 
 
