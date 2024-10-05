@@ -1,4 +1,4 @@
-beeprback/src/middlewares/validate.js
+
 
 const Joi = require('joi');
 const httpStatus = require('http-status');

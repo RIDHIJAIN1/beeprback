@@ -1,4 +1,3 @@
-beeprback/src/validations/auth.validation.js
 
 const Joi = require('joi');
 const { password } = require('./custom.validation');

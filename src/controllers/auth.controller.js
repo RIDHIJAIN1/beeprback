@@ -1,4 +1,4 @@
-beeprback/src/controllers/auth.controller.js
+
 
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
