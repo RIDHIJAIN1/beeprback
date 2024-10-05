@@ -1,13 +1,16 @@
+beeprback/src/validations/auth.validation.js
+
 const Joi = require('joi');
 const { password } = require('./custom.validation');
-const { roles } = require('../config/roles');
 
 const register = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
     name: Joi.string().required(),
-    role: Joi.string().valid(...roles).optional(), 
+    role: Joi.string().valid('seller').optional().messages({
+      'any.only': 'Invalid parameter - role',
+    }),
   }),
 };
 
