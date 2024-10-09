@@ -34,6 +34,11 @@ const productSchema = mongoose.Schema(
       required: true,
       min: 0, // Weight cannot be negative
     },
+    price: {
+      type: Number,
+      required: true,
+      min: 0, // Weight cannot be negative
+    },
     description: {
       type: String,
       required: true,
