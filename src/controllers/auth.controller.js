@@ -16,7 +16,7 @@ const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   let user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ data: { user, tokens }, status: true });
+  res.status(httpStatus.OK).send({ data: { user, tokens }, status: true });
 });
 
 const logout = catchAsync(async (req, res) => {
@@ -30,14 +30,15 @@ const refreshTokens = catchAsync(async (req, res) => {
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
-  await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.NO_CONTENT).send({ status: true });
+  const resetPasswordToken = await tokenService.generateResetPasswordToken(res, req.body.email);
+  // await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
+  res.status(httpStatus.OK).send({ status: true, data: { token: resetPasswordToken } });
 });
 
+
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(req.query.token, req.body.password);
-  res.status(httpStatus.NO_CONTENT).send({ status: true });
+  await authService.resetPassword(res, req.body.token, req.body.password);
+  res.status(httpStatus.OK).send({ status: true });
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
@@ -50,9 +51,6 @@ const getUserFromToken = catchAsync(async (req, res) => {
   // Extract the user from token
   if (req.user.role == 'seller') {
     const seller = await Seller.findOne({ userId: req.user._id });
-    // console.log("\n\n")
-    // console.log(seller)
-    // console.log("\n\n")
     if (!seller) {
       return res.status(httpStatus.OK).send(req.user);
     } else {
