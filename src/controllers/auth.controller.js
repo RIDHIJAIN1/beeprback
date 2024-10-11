@@ -31,20 +31,26 @@ const refreshTokens = catchAsync(async (req, res) => {
 
 const forgotPassword = catchAsync(async (req, res) => {
   const resetPasswordToken = await tokenService.generateResetPasswordToken(res, req.body.email);
-  // await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.OK).send({ status: true, data: { token: resetPasswordToken } });
+  await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
+  res.status(httpStatus.OK).send({ status: true, message: "OTP sent on mail successfully!" });
 });
 
-
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(res, req.body.token, req.body.password);
-  res.status(httpStatus.OK).send({ status: true });
+  try {
+    await authService.resetPassword(req.body.otp, req.body.email, req.body.password);
+    res.status(httpStatus.OK).send({ status: true });
+  } catch (error) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      status: false,
+      message: error.message || 'Password reset failed!',
+    });
+  }
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
   const verifyEmailToken = await tokenService.generateVerifyEmailToken(req.user);
   await emailService.sendVerificationEmail(req.user.email, verifyEmailToken);
-  res.status(httpStatus.NO_CONTENT).send({ status: true });
+  res.status(httpStatus.NO_CONTENT).send({ status: true, message: "Password reset successfully!" });
 });
 
 const getUserFromToken = catchAsync(async (req, res) => {

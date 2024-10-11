@@ -54,10 +54,16 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
 const verifyToken = async (token, type) => {
   const payload = jwt.verify(token, config.jwt.secret);
   const tokenDoc = await Token.findOne({ token, type, user: payload.sub, blacklisted: false });
-  if (!tokenDoc) {
+  if (!tokenDoc)
     throw new Error('Token not found');
-  }
   return tokenDoc;
+};
+const verifyOtp = async (otp, user, type) => {
+  const tokenOtp = await Token.findOne({ token: otp, type, user: user._id, blacklisted: false });
+  if (!tokenOtp) {
+    throw new Error('Invalid or expired OTP!');
+  }
+  return tokenOtp;
 };
 
 /**
@@ -99,9 +105,9 @@ const generateResetPasswordToken = async (res, email) => {
     });
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
-  await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
-  return resetPasswordToken;
+  const resetPasswordOTP = Math.floor(1000 + Math.random() * 9000);;
+  await saveToken(resetPasswordOTP, user.id, expires, tokenTypes.RESET_PASSWORD);
+  return resetPasswordOTP;
 };
 
 /**
@@ -120,6 +126,7 @@ module.exports = {
   generateToken,
   saveToken,
   verifyToken,
+  verifyOtp,
   generateAuthTokens,
   generateResetPasswordToken,
   generateVerifyEmailToken,
