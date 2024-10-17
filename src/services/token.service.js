@@ -105,7 +105,7 @@ const generateResetPasswordToken = async (res, email) => {
     });
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordOTP = Math.floor(1000 + Math.random() * 9000);;
+  const resetPasswordOTP = Math.floor(1000 + Math.random() * 9000);
   await saveToken(resetPasswordOTP, user.id, expires, tokenTypes.RESET_PASSWORD);
   return resetPasswordOTP;
 };
@@ -117,7 +117,7 @@ const generateResetPasswordToken = async (res, email) => {
  */
 const generateVerifyEmailToken = async (user) => {
   const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
+  const verifyEmailToken = Math.floor(1000 + Math.random() * 9000);
   await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);
   return verifyEmailToken;
 };
