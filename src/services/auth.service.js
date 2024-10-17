@@ -53,39 +53,31 @@ const refreshAuth = async (refreshToken) => {
 
 /**
  * Reset password
- * @param {string} resetPasswordToken
+ * @param {string} otp
+ * @param {string} email
  * @param {string} newPassword
  * @returns {Promise}
  */
 const resetPassword = async (otp, email, newPassword) => {
-  try {
     const user = await userService.getUserByEmail(email);
     if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid user!');
     await tokenService.verifyOtp(otp, user, tokenTypes.RESET_PASSWORD);
     await userService.updateUserById(user.id, { password: newPassword });
     await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
-  } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, error.message || 'Something went wrong!');
-  }
 };
 
 /**
  * Verify email
- * @param {string} verifyEmailToken
+ * @param {string} otp
+ * @param {string} email
  * @returns {Promise}
  */
-const verifyEmail = async (verifyEmailToken) => {
-  try {
-    const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
-    const user = await userService.getUserById(verifyEmailTokenDoc.user);
-    if (!user) {
-      throw new Error();
-    }
-    await Token.deleteMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL });
-    await userService.updateUserById(user.id, { isEmailVerified: true });
-  } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
-  }
+const verifyEmail = async (otp, email) => {
+  const user = await userService.getUserByEmail(email);
+  if (!user) throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid user email!');
+  await tokenService.verifyOtp(otp, user, tokenTypes.VERIFY_EMAIL);
+  await userService.updateUserById(user.id, { isEmailVerified: true });
+  await Token.deleteMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL });
 };
 
 module.exports = {

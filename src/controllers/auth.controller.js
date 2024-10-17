@@ -32,7 +32,7 @@ const refreshTokens = catchAsync(async (req, res) => {
 const forgotPassword = catchAsync(async (req, res) => {
   const resetPasswordToken = await tokenService.generateResetPasswordToken(res, req.body.email);
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.OK).send({ status: true, message: "OTP sent on mail successfully!" });
+  res.status(httpStatus.OK).send({ status: true, message: "Reset password process OTP sent on mail successfully!" });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
@@ -50,7 +50,21 @@ const resetPassword = catchAsync(async (req, res) => {
 const sendVerificationEmail = catchAsync(async (req, res) => {
   const verifyEmailToken = await tokenService.generateVerifyEmailToken(req.user);
   await emailService.sendVerificationEmail(req.user.email, verifyEmailToken);
-  res.status(httpStatus.NO_CONTENT).send({ status: true, message: "Password reset successfully!" });
+  res.status(httpStatus.OK).send({ status: true, message: "Email verification OTP sent on mail successfully!" });
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+  try {
+    await authService.verifyEmail(req.body.otp, req.user.email);
+    res.status(httpStatus.OK).send({ status: true, message:"User email verified successfully!" });
+  } catch (error) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      status: false,
+      message: error.message || 'Email verification failed',
+    });
+  }
+
+
 });
 
 const getUserFromToken = catchAsync(async (req, res) => {
@@ -68,11 +82,6 @@ const getUserFromToken = catchAsync(async (req, res) => {
     }
   }
   return res.status(httpStatus.OK).send({ data: req.user, status: true });
-});
-
-const verifyEmail = catchAsync(async (req, res) => {
-  await authService.verifyEmail(req.query.token);
-  res.status(httpStatus.NO_CONTENT).send({ status: true });
 });
 
 module.exports = {
