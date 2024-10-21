@@ -11,8 +11,12 @@ router.post('/', questionController.createQuestion);
 // Get all categories
 router.get('/', questionController.getQuestion);
 
+router.get('/user/:questionId?', questionController.getQuestionWithOption);
 // Get a category by ID
 router.get('/:questionId', questionController.getQuestionById);
+// router.get('/user', questionController.getQuestionWithOption);
+
+
 
 // Update a category by ID
 router.patch('/:questionId', questionController.updateQuestion);

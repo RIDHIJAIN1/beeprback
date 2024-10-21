@@ -1,8 +1,8 @@
 const httpStatus = require('http-status');
 const { User } = require('../models');
-// const  Product } = require('../models/product.model');
+//do it for all models to maintain sturcuture okay darlingggggg 😘😘 😊😊😊
 const ApiError = require('../utils/ApiError');
-const Product = require('../models/product.model');
+const {Product} = require('../models');
 
 /**
  * Create a user

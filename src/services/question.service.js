@@ -1,6 +1,8 @@
 const httpStatus = require('http-status');
-const  Question  = require('../models/question.model'); // Adjust the path as necessary
+const Question = require('../models/question.model'); // Adjust the path as necessary
 const ApiError = require('../utils/ApiError');
+const Options = require('../models/options.model');
+const mongoose = require('mongoose');
 
 /**
  * Create a question
@@ -33,6 +35,71 @@ const queryQuestions = async (filter, options) => {
  */
 const getQuestionById = async (id) => {
   return Question.findById(id);
+};
+
+const getQuestionByIdWithOptions = async (questionId) => {
+  let question;
+
+  // Ensure questionId is of type ObjectId
+  const objectId = mongoose.Types.ObjectId(questionId);
+
+  // Use aggregation pipeline to match question and lookup options
+  question = await Question.aggregate([
+    {
+      $match: {
+        _id: objectId, // Match by ObjectId
+      },
+    },
+    {
+      $lookup: {
+        from: 'options', // The collection to join (use collection name, which is usually the plural form)
+        localField: '_id', // Field in Question collection
+        foreignField: 'question_id', // Field in Options collection
+        as: 'options', // The result will be placed in an 'options' array
+      },
+    },
+  ]);
+
+  // Since aggregation returns an array, get the first result
+  if (!question || question.length === 0) {
+    return null; // If no question found, return null
+  }
+
+  // Return the first element from the array (the question with options)
+  return question[0];
+};
+
+// In questionService.js
+const getDefaultQuestionWithOptions = async () => {
+  const question = await Question.aggregate([
+    // Match the default question
+    {
+      $match: {
+        default: true,
+      },
+    },
+    // Use $lookup to fetch the related options
+    {
+      $lookup: {
+        from: 'options', // The collection to join (it must be the name of the collection in the DB)
+        localField: '_id', // The field from Question model
+        foreignField: 'question_id', // The field from Options model that matches
+        as: 'options', // The name of the output array field
+      },
+    },
+  ]);
+
+  // Replace with your actual database query logic
+  // const question = await Question.findOne({ default: true }).populate('options');
+
+  if (!question) {
+    return null; // If no default question found, return null
+  }
+
+  return {
+    question,
+    // options // Only return the value field from options
+  };
 };
 
 /**
@@ -71,4 +138,6 @@ module.exports = {
   getQuestionById,
   updateQuestionById,
   deleteQuestionById,
+  getDefaultQuestionWithOptions,
+  getQuestionByIdWithOptions,
 };

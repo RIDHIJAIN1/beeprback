@@ -6,7 +6,11 @@ const createProduct = {
    
     title: Joi.string().required(),
     deliveryOption: Joi.string().required().valid('standard', 'express', 'overnight'), // Example delivery options
+    unit: Joi.string().required().valid('mg', 'g', 'kg','l','ml'), // Example delivery options
     weight: Joi.number().required().min(0), // Weight must be a non-negative number
+    price: Joi.number().required().min(0), // Weight must be a non-negative number
+    duplicatePrice: Joi.number().required().min(0), // Weight must be a non-negative number
+    qty: Joi.number().required().min(0), // Weight must be a non-negative number
     description: Joi.string().required(),
     categoryId: Joi.string().required().custom(objectId), // Validate categoryId
     // Reference to Seller ID

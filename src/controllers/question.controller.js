@@ -28,6 +28,27 @@ const getQuestion = catchAsync(async (req, res) => {
     data:questions});
 });
 
+const getQuestionWithOption = catchAsync(async (req, res) => {
+  const questionId = req.params.questionId || null;  // Use null if no questionId is provided
+  let question;
+
+  if (!questionId) {
+    question = await questionService.getDefaultQuestionWithOptions();
+
+  } else {
+    question = await questionService.getQuestionByIdWithOptions(questionId);
+
+  }
+
+  if (!question) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Question not found');
+  }
+
+  res.send({
+    data: question  // Send back the question and its options
+  });
+});
+
 // Get category by ID
 const getQuestionById = catchAsync(async (req, res) => {
   const question = await questionService.getQuestionById(req.params.questionId);
@@ -38,6 +59,20 @@ const getQuestionById = catchAsync(async (req, res) => {
     
     data:question});
 });
+// const getQuestionWithOption = catchAsync(async (req, res) => {
+//   const questionId = req.params.questionId || null;  // Use null if no questionId is provided
+
+//   const question = await questionService.getQuestionByIdWithOptions(questionId);
+  
+//   if (!question) {
+//     throw new ApiError(httpStatus.NOT_FOUND, 'Question not found');
+//   }
+
+//   res.send({
+//     data: question  // Send back the question and its options
+//   });
+// });
+
 
 // Update a category by ID
 const updateQuestion = catchAsync(async (req, res) => {
@@ -64,4 +99,5 @@ module.exports = {
     getQuestion,
     updateQuestion,
     deleteQuestion,
+    getQuestionWithOption
 };
