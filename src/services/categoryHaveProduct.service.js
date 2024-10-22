@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const CategoryHaveProduct = require('../models/categoryHaveProduct.model'); // Assuming you have this model defined
+const Product = require('../models/product.model'); // Assuming you have this model defined
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -34,12 +35,24 @@ const queryCategoryHaveProducts = async (filter, options) => {
  * @returns {Promise<CategoryHaveProduct>}
  */
 const getCategoryHaveProductById = async (id) => {
+  // Find the category by its ID
   const categoryProduct = await CategoryHaveProduct.findById(id);
+
   if (!categoryProduct) {
     throw new ApiError(httpStatus.NOT_FOUND, 'CategoryHaveProduct not found');
   }
-  return categoryProduct;
+
+  // Now, fetch the product data using the productId from the category
+  const product = await Product.findById(categoryProduct.productId);
+
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found for this category');
+  }
+
+  // Return both category and product data
+  return { categoryProduct, product };
 };
+
 
 /**
  * Update CategoryHaveProduct by ID

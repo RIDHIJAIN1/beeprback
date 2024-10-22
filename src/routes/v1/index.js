@@ -9,6 +9,7 @@ const optionRoute = require('./option.route');
 const userProfileRoute = require('./userProfile.route');
 const categoryProductRoute = require('./categoryHaveProduct.route');
 const reviewRoute = require('./review.route');
+const favoriteRoute = require('./favorite.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -57,6 +58,11 @@ const defaultRoutes = [
   {
     path: '/reviews',
     route: reviewRoute,
+  }
+  ,
+  {
+    path: '/favorite',
+    route: favoriteRoute,
   }
 
 ];

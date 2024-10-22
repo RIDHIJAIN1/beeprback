@@ -13,7 +13,7 @@ const router = express.Router();
 router.post(
   '/',
   auth('manageProducts'),
-  sellerIsApproved,
+  sellerIsApproved,authMiddleware,
   upload.fields([{ name: 'image', maxCount: 1 }]), // Ensure 'image' is correctly defined in your upload middleware
   validate(productValidation.createProduct),
   productController.createProduct
