@@ -6,6 +6,9 @@ const productRoute = require('./product.route');
 const catgoryRoute = require('./category.route');
 const questionRoute = require('./question.route');
 const optionRoute = require('./option.route');
+const userProfileRoute = require('./userProfile.route');
+const categoryProductRoute = require('./categoryHaveProduct.route');
+const reviewRoute = require('./review.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
@@ -40,6 +43,20 @@ const defaultRoutes = [
   {
     path: '/options',
     route: optionRoute,
+  },
+  {
+    path: '/categoryProduct',
+    route: categoryProductRoute,
+  }
+  ,
+  {
+    path: '/userProfile',
+    route: userProfileRoute,
+  }
+  ,
+  {
+    path: '/reviews',
+    route: reviewRoute,
   }
 
 ];

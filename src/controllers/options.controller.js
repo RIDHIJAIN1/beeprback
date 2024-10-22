@@ -8,17 +8,22 @@ const optionService = require('../services/option.service');
  * Create a new option
  */
 const createOption = catchAsync(async (req, res) => {
+  // Collect validated data from the request body
   const optionData = {
-    name: req.body.name,
+    question_id: req.body.question_id,
+    type: req.body.type,
     value: req.body.value,
-    productId: req.body.productId,  // Ensure this is associated with a product
-    sellerId: req.userId,           // Assuming sellerId is set from the token
+    next_question_id: req.body.next_question_id || null, // Only include if type is 'next_question'
+    category_id: req.body.category_id || null,           // Only include if type is 'product_category'
+       
   };
 
+  // Call the option service to create the option
   const option = await optionService.createOption(optionData);
+
+  // Send back the created option in the response
   res.status(httpStatus.CREATED).send(option);
 });
-
 /**
  * Get all options
  */
@@ -41,7 +46,7 @@ const getOptions = catchAsync(async (req, res) => {
   }
 
   const optionList = await optionService.queryOptions(filter, options);
-  res.send(optionList);
+  res.send({data:optionList});
 });
 
 /**

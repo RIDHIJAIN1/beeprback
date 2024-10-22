@@ -18,7 +18,6 @@ const createOption = {
     value: Joi.string().required().trim(), // The value associated with the option
   }),
 };
-
 const getOptions = {
   query: Joi.object().keys({
     question_id: Joi.string().custom(objectId), // Optional filter by question ID

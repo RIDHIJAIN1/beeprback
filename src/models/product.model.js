@@ -34,7 +34,22 @@ const productSchema = mongoose.Schema(
       required: true,
       min: 0, // Weight cannot be negative
     },
+    qty: {
+      type: Number,
+      required: true,
+      min: 0, // Weight cannot be negative
+    },
+    unit: {
+      type: String,
+      required: true,
+      enum: ['mg', 'g', 'kg', 'l' , 'ml'],
+    },
     price: {
+      type: Number,
+      required: true,
+      min: 0, // Weight cannot be negative
+    },
+    duplicatePrice: {
       type: Number,
       required: true,
       min: 0, // Weight cannot be negative
@@ -48,6 +63,7 @@ const productSchema = mongoose.Schema(
         type: Boolean,
         default: false, // Indicates whether the category is "deleted"
       },
+
     // reviews: [
     //   {
     //     user: {

@@ -9,6 +9,11 @@ const questionSchema = mongoose.Schema(
     required:true,
     trim: true
    },
+   default:{
+    type:Boolean,
+    default:false
+    
+   }
     
   },
   {
