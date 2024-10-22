@@ -2,57 +2,49 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { favouriteService } = require('../services');
+const { favoriteService } = require('../services');
 
-const createFavourite = catchAsync(async (req, res) => {
-  const favourite = await favouriteService.createFavourite(req.body);
+/**
+ * Create or toggle a favourite (like or dislike)
+ */
+const createOrToggleFavourite = catchAsync(async (req, res) => {
+  const favourite = await favoriteService.createOrToggleFavourite(req); // Pass the full request object
   res.status(httpStatus.CREATED).send(favourite);
 });
 
-const getFavourites = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['user_id', 'product_id']);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  if (!options.sortBy) {
-    options.sortBy = 'createdAt:desc'; // Default sorting
-  }
-  const result = await favouriteService.queryFavourites(filter, options);
+/**
+ * Get all favourites for a user
+ */
+const getAllFavourites = catchAsync(async (req, res) => {
+  console.log(`\n\n\n\n ${req.userId} \n\n\n\n`)
+  const userId = req.userId; // Get userId from the token (via auth middleware)
+  const result = await favoriteService.getAllFavourites(userId);
+  console.log(`\n\n\n\n ${result} \n\n\n\n`)
   res.send(result);
 });
 
+/**
+ * Get favourite by id
+ */
 const getFavourite = catchAsync(async (req, res) => {
-  const favourite = await favouriteService.getFavouriteById(req.params.favouriteId);
+  const favourite = await favoriteService.getFavouriteById(req.params.favouriteId);
   if (!favourite) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Favourite not found');
   }
   res.send(favourite);
 });
 
-const updateFavourite = catchAsync(async (req, res) => {
-  const favourite = await favouriteService.updateFavouriteById(req.params.favouriteId, req.body);
-  res.send(favourite);
-});
-
+/**
+ * Delete a favourite by id
+ */
 const deleteFavourite = catchAsync(async (req, res) => {
-  await favouriteService.deleteFavouriteById(req.params.favouriteId);
+  await favoriteService.deleteFavouriteById(req.params.favouriteId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const toggleFavouriteStatus = catchAsync(async (req, res) => {
-  const favourite = await favouriteService.toggleFavourite(req.params.favouriteId);
-  res.send(favourite);
-});
-
-const countFavourites = catchAsync(async (req, res) => {
-  const favouriteCount = await favouriteService.countFavourites();
-  res.status(httpStatus.OK).json({ favouriteCount });
-});
-
 module.exports = {
-  createFavourite,
-  getFavourites,
+  createOrToggleFavourite,
+  getAllFavourites,
   getFavourite,
-  updateFavourite,
   deleteFavourite,
-  toggleFavouriteStatus,
-  countFavourites,
 };

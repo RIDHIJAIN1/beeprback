@@ -28,8 +28,9 @@ const createProduct = catchAsync(async (req, res) => {
     image: path.join('uploads', path.basename(image[0].path)), // Assuming image is stored in the path
     title: req.body.title,
     deliveryOption: req.body.deliveryOption,
-    unit:req.body.unit,unit,
+    unit:req.body.unit,
     price: req.body.price,
+    duplicatePrice: req.body.duplicatePrice,
     qty: req.body.qty,
     weight: req.body.weight,
     description: req.body.description,

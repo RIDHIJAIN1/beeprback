@@ -16,7 +16,13 @@ const userProfileSchema = mongoose.Schema(
       },
       image: {
         type: String,
-        required: true,
+        default: null
+      },
+
+      bio: {
+        type: String,
+        maxlength: 500, // Limiting the length of the bio
+        default: '', // Optional field with a default empty string
       },
    
   },

@@ -49,7 +49,7 @@ const getCategoryHaveProduct = catchAsync(async (req, res) => {
   const { categoryProductId } = req.params;
 
   // Call the service layer to fetch the CategoryHaveProduct by ID
-  const categoryProduct = await categoryHaveProductService.getCategoryHaveProductById(categoryProductId);
+  const{ categoryProduct , product} = await categoryHaveProductService.getCategoryHaveProductById(categoryProductId);
   
   // If the entry is not found, throw a 404 error
   if (!categoryProduct) {
@@ -57,7 +57,10 @@ const getCategoryHaveProduct = catchAsync(async (req, res) => {
   }
 
   // Return the found entry
-  res.send(categoryProduct);
+  res.send({
+    category: categoryProduct,
+    product: product, // Assuming the products are populated in the categoryProduct object
+  });
 });
 
 /**

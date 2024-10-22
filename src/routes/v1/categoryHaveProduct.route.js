@@ -25,7 +25,7 @@ router.get(
 // Get a CategoryHaveProduct entry by ID
 router.get(
   '/:categoryProductId',
-  auth('getCategories'),        // Permission to fetch a specific CategoryHaveProduct
+      // Permission to fetch a specific CategoryHaveProduct
   validate(categoryHaveProductValidation.getCategoryProduct), // Validate the input for fetching by ID
   categoryHaveProductController.getCategoryHaveProduct    // Controller to handle fetching by ID
 );

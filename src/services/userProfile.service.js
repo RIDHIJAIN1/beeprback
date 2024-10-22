@@ -115,10 +115,10 @@ const queryUserProfiles = async (userProfileFilter, options, userFilter) => {
  * @param {ObjectId} id
  * @returns {Promise<UserProfile>}
  */
-const getUserProfileById = async (id) => {
-    console.log(`\n\n\n\n yaha tk to phoch gya ye bhi to dekhe \n\n\n\n`); // Prints an empty line followed by the userProfile object
-  const userProfile = await UserProfile.findById(id).populate('user_id');
-  console.log(`\n\n\n\n${JSON.stringify(userProfile, null, 2)}\n\n\n\n`); // Prints an empty line followed by the userProfile object
+const getUserProfileById = async (user_id) => {
+ 
+  const userProfile = await UserProfile.findOne({ user_id }).populate('user_id');
+
   if (!userProfile) {
     throw new ApiError(httpStatus.NOT_FOUND, 'UserProfile not found');
   }
@@ -138,11 +138,19 @@ const updateUserProfileById = async (userProfileId, updateBody) => {
   return userProfile;
 };
 
+
+const getUserProfileByUserId = async (user_id) => {
+  return await UserProfile.findOne({ user_id });
+};
 /**
  * Delete UserProfile by id
  * @param {ObjectId} userProfileId
  * @returns {Promise<UserProfile>}
  */
+
+const updateUserProfileByUserId = async (user_id, updateData) => {
+  return await UserProfile.findOneAndUpdate({ user_id }, updateData, { new: true });
+};
 const deleteUserProfileById = async (userProfileId) => {
   const userProfile = await getUserProfileById(userProfileId);
   await userProfile.remove();
@@ -158,5 +166,7 @@ module.exports = {
   queryUserProfiles,
   getUserProfileById,
   updateUserProfileById,
+  updateUserProfileByUserId,
   deleteUserProfileById,
+  getUserProfileByUserId
 };

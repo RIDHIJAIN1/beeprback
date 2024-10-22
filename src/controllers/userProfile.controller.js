@@ -3,31 +3,78 @@ const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/ApiError');
 const pick = require('../utils/pick');
 const userProfileService = require('../services/userProfile.service');
+const userService = require('../services/user.service');
 
 // Create a User Profile
 const createUserProfile = catchAsync(async (req, res) => {
-    const { user_id, categoryproduct_id } = req.body;
-  
-    // Log req.files to see if the image is being uploaded
-    console.log(req.files);
-  
-    // Check if image is present in req.files
-    if (!user_id || !req.files || !req.files.image) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'user_id and image are required');
-    }
-  
-    const image = req.files.image[0].filename; // Multer saves the file info in an array
-  
-    const userProfileData = {
-      user_id,
-      image,
-      ...(categoryproduct_id && { categoryproduct_id }),
-    };
-  
-    const userProfile = await userProfileService.createUserProfile(userProfileData);
-    res.status(httpStatus.CREATED).send(userProfile);
-  });
-  
+  const { categoryproduct_id, name, bio } = req.body; 
+  const user_id = req.userId; // Get user_id from the decoded token
+
+  if (!user_id) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Login required');
+  }
+
+  // Check if an image file was uploaded
+  let image = null;
+  if (req.files && req.files.image && req.files.image.length > 0) {
+      image = req.files.image[0].filename; // Get the image filename if it exists
+  }
+
+  // Check if the user profile already exists
+  const existingProfile = await userProfileService.getUserProfileByUserId(user_id);
+
+  if (existingProfile) {
+      // If profile exists, update the image and other fields
+      const updatedProfileData = {
+          name,
+          bio,
+          ...(categoryproduct_id && { categoryproduct_id }),
+      };
+
+      // Explicitly set image to null if no new image is provided
+      updatedProfileData.image = image !== null ? image : null;
+
+      const updatedUserProfile = await userProfileService.updateUserProfileByUserId(user_id, updatedProfileData);
+
+      // Also update the user's name in the users table
+      const updatedUser = await userService.updateUserNameById(user_id, name);
+      if (!updatedUser) {
+          throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+      }
+
+      return res.status(httpStatus.OK).send({
+          userProfile: updatedUserProfile,
+          updatedUser,
+          message: 'User profile updated with new image and name',
+      });
+  } else {
+      // If profile doesn't exist, create a new one
+      const newUserProfileData = {
+          user_id,
+          name,
+          image: image || null, // Set to null if no image is provided
+          bio,
+          ...(categoryproduct_id && { categoryproduct_id }),
+      };
+
+      const newUserProfile = await userProfileService.createUserProfile(newUserProfileData);
+
+      // Update the user's name in the users table
+      const updatedUser = await userService.updateUserNameById(user_id, name);
+      if (!updatedUser) {
+          throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+      }
+
+      return res.status(httpStatus.CREATED).send({
+          userProfile: newUserProfile,
+          updatedUser,
+          message: 'User profile and name created successfully',
+      });
+  }
+});
+
+
+
 
 // Get all User Profiles with pagination and filters
 const getUserProfiles = catchAsync(async (req, res) => {
@@ -44,23 +91,16 @@ const getUserProfiles = catchAsync(async (req, res) => {
 
 // Get a User Profile by ID
 const getUserProfileById = catchAsync(async (req, res) => {
-  const userProfile = await userProfileService.getUserProfileById(req.params.userProfileId);
+  const user_id = req.userId
+  const userProfile = await userProfileService.getUserProfileById(user_id);
   if (!userProfile) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Profile not found');
   }
   res.send(userProfile);
 });
 
-// Update a User Profile by ID
-const updateUserProfile = catchAsync(async (req, res) => {
-  const userProfile = await userProfileService.updateUserProfileById(req.params.userProfileId, req.body);
-  if (!userProfile) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User Profile not found');
-  }
-  res.send(userProfile);
-});
 
-// Delete a User Profile by ID
+
 const deleteUserProfile = catchAsync(async (req, res) => {
   await userProfileService.deleteUserProfileById(req.params.userProfileId);
   res.status(httpStatus.NO_CONTENT).send();
@@ -70,6 +110,6 @@ module.exports = {
   createUserProfile,
   getUserProfiles,
   getUserProfileById,
-  updateUserProfile,
+
   deleteUserProfile,
 };
