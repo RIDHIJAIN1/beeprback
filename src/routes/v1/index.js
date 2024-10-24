@@ -3,11 +3,12 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const sellerRoute = require('./seller.route');
 const productRoute = require('./product.route');
-const catgoryRoute = require('./category.route');
+const recommendationRoute = require('./recommendation.route');
+const categoryRoute = require('./category.route');
 const questionRoute = require('./question.route');
 const optionRoute = require('./option.route');
 const userProfileRoute = require('./userProfile.route');
-const categoryProductRoute = require('./categoryHaveProduct.route');
+const recommendedProductRoute = require('./recommendedProduct.route');
 const reviewRoute = require('./review.route');
 const favoriteRoute = require('./favorite.route');
 const docsRoute = require('./docs.route');
@@ -34,8 +35,8 @@ const defaultRoutes = [
   }
   ,
   {
-    path: '/category',
-    route: catgoryRoute,
+    path: '/recommendation',
+    route: recommendationRoute,
   },
   {
     path: '/question',
@@ -46,8 +47,8 @@ const defaultRoutes = [
     route: optionRoute,
   },
   {
-    path: '/categoryProduct',
-    route: categoryProductRoute,
+    path: '/recommendedProduct',
+    route: recommendedProductRoute,
   }
   ,
   {
@@ -63,6 +64,11 @@ const defaultRoutes = [
   {
     path: '/favorite',
     route: favoriteRoute,
+  }
+  ,
+  {
+    path: '/category',
+    route: categoryRoute,
   }
 
 ];

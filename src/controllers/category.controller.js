@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const categoryService = require('../services/category.service');
+const {categoryService} = require('../services');
 const ApiError = require('../utils/ApiError');
 const pick = require('../utils/pick');
 
@@ -44,6 +44,12 @@ const updateCategory = catchAsync(async (req, res) => {
 // Toggle category status
 const statusChangeCategory = catchAsync(async (req, res) => {
   await categoryService.statusChangeById(req.params.categoryId);
+  res.status(httpStatus.OK).send({message:"Status changed successfully!"});
+});
+
+
+const fetchActiveCategory = catchAsync(async (req, res) => {
+  await categoryService.fetchActiveCategory(req.params.categoryId);
   res.status(httpStatus.OK).send({message:"Status changed successfully!"});
 });
 

@@ -42,11 +42,13 @@ const createUserProfile = catchAsync(async (req, res) => {
           throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
       }
 
-      return res.status(httpStatus.OK).send({
+      return res.status(httpStatus.OK).send({data:{
           userProfile: updatedUserProfile,
           updatedUser,
-          message: 'User profile updated with new image and name',
+          message: 'User profile updated with new image and name',},
+          status:true
       });
+     
   } else {
       // If profile doesn't exist, create a new one
       const newUserProfileData = {

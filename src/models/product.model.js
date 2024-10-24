@@ -8,6 +8,11 @@ const productSchema = mongoose.Schema(
         ref: 'Seller', // Reference to the Seller model
         required: true,
       },
+    recommendationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Recommendation', // Reference to the Seller model
+        required: true,
+      },
     categoryId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category', // Reference to the Seller model
@@ -61,32 +66,8 @@ const productSchema = mongoose.Schema(
     },
     deleted: {
         type: Boolean,
-        default: false, // Indicates whether the category is "deleted"
+        default: false, 
       },
-
-    // reviews: [
-    //   {
-    //     user: {
-    //       type: mongoose.Schema.Types.ObjectId,
-    //       ref: 'User', // Reference to the User model
-    //       required: true,
-    //     },
-    //     rating: {
-    //       type: Number,
-    //       required: true,
-    //       min: 1,
-    //       max: 5, // Assuming a 1 to 5 star rating
-    //     },
-    //     comment: {
-    //       type: String,
-    //       trim: true,
-    //     },
-    //     createdAt: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ],
     
   },
   {

@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const Category = require('../models/category.model'); // Adjust the path as necessary
+const {Category} = require('../models'); // Adjust the path as necessary
 const ApiError = require('../utils/ApiError');
 
 /**

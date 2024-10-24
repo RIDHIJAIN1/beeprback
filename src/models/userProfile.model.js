@@ -9,9 +9,9 @@ const userProfileSchema = mongoose.Schema(
         ref: 'User', // Reference to the Question model kya
         required: true,
       },
-    categoryproduct_id: {
+    recommendedproduct_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Categoryproducts', // Reference to the Question model
+        ref: 'RecommendedProducts', // Reference to the Question model
       
       },
       image: {

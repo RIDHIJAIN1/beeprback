@@ -2,8 +2,8 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const productService = require('../services/product.service');
-const Category = require('../models/category.model');
+const {productService} = require('../services');
+const {Recommendation} = require('../models');
 const path = require('path');
 // Create a new product
 const createProduct = catchAsync(async (req, res) => {
@@ -14,12 +14,12 @@ const createProduct = catchAsync(async (req, res) => {
     });
   }
 
-  const { categoryId } = req.body;
+  const { recommendationId } = req.body;
 
-  const category = await Category.findById(categoryId); // Adjust based on your Category model and schema
-  if (!category || !category.status) {
+  const recommendation = await Recommendation.findById(recommendationId); // Adjust based on your recommendation model and schema
+  if (!recommendation || !recommendation.status) {
     return res.status(httpStatus.BAD_REQUEST).send({
-      message: 'Product cannot be created because the category is not active.',
+      message: 'Product cannot be created because the recommendation is not active.',
     });
   }
 
@@ -34,6 +34,7 @@ const createProduct = catchAsync(async (req, res) => {
     qty: req.body.qty,
     weight: req.body.weight,
     description: req.body.description,
+    recommendationId: req.body.recommendationId,
     categoryId: req.body.categoryId,
     sellerId: req.userId, 
     // Ensure this is set from the token
@@ -50,8 +51,8 @@ const getProducts = catchAsync(async (req, res) => {
   if (req.query.title) {
     filter.title = { $regex: req.query.title, $options: 'i' }; // Case-insensitive search
   }
-  if (req.query.category) {
-    filter.category = req.query.category;
+  if (req.query.recommendation) {
+    filter.recommendation = req.query.recommendation;
   }
 
   if (req.query.id) {
@@ -67,19 +68,23 @@ const getProducts = catchAsync(async (req, res) => {
     options.sortBy = 'createdAt:desc';
   }
   const products = await productService.queryProducts(filter, options);
-  res.send(products);
+  res.status(httpStatus.OK).send({ data: { products }, status: true , message: "Products fetched successfully"})
+ 
 });
 
 // Get a product by ID
 // Get a product by productId or sellerId
 const getProduct = catchAsync(async (req, res) => {
-  const { productId, sellerId } = req.query;
+  const { productId, sellerId , categoryId} = req.query;
 
   let product;
   if (productId) {
     product = await productService.getProductById(productId); // Query by productId
   } else if (sellerId) {
     product = await productService.getProductsBySellerId(sellerId); // Query by sellerId
+  
+  } else if (categoryId) {
+    product = await productService.getProductsByCategoryId(categoryId); // Query by sellerId
   } else {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Either productId or sellerId is required');
   }
@@ -87,9 +92,10 @@ const getProduct = catchAsync(async (req, res) => {
   if (!product) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
   }
+  res.status(httpStatus.OK).send({ data: { product }, status: true })
 
-  res.send(product);
 });
+
 
 
 // Update a product by ID

@@ -5,7 +5,7 @@ const { objectId } = require('./custom.validation');
 const createUserProfile = {
   body: Joi.object().keys({
     user_id: Joi.string().custom(objectId).required(), // Assuming user_id is an ObjectId
-    categoryproduct_id: Joi.string().custom(objectId).optional(), // Assuming categoryproduct_id is an ObjectId
+    recommendedproduct_id: Joi.string().custom(objectId).optional(), // Assuming categoryproduct_id is an ObjectId
     image: Joi.string().optional(), // Image URL or path as string
     bio: Joi.string().optional(), // Image URL or path as string
   }),
@@ -32,7 +32,7 @@ const getUserProfile = {
 const updateUserProfileById = {
   body: Joi.object().keys({
     user_id: Joi.string().custom(objectId).optional(), // Can be optional during an update
-    categoryproduct_id: Joi.string().custom(objectId).optional(),
+    recommendedproduct_id: Joi.string().custom(objectId).optional(),
     image: Joi.string().optional(), // Optional if the image is not being updated
     bio: Joi.string().optional(), // Optional if the image is not being updated
   }),

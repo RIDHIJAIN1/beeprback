@@ -4,14 +4,14 @@ const { objectId } = require('./custom.validation');
 const createOption = {
   body: Joi.object().keys({
     question_id: Joi.string().required().custom(objectId), // Reference to the question ID
-    type: Joi.string().required().valid('next_question', 'product_category'), // Type must be one of the enum values
+    type: Joi.string().required().valid('next_question', 'product_recommended'), // Type must be one of the enum values
     next_question_id: Joi.when('type', {
       is: 'next_question',
       then: Joi.string().required().custom(objectId), // Required if type is 'next_question'
       otherwise: Joi.forbidden(), // Disallow this field otherwise
     }),
-    category_id: Joi.when('type', {
-      is: 'product_category',
+    recommendation_id: Joi.when('type', {
+      is: 'product_recommended',
       then: Joi.string().required().custom(objectId), // Required if type is 'product_category'
       otherwise: Joi.forbidden(), // Disallow this field otherwise
     }),
@@ -20,9 +20,9 @@ const createOption = {
 };
 const getOptions = {
   query: Joi.object().keys({
-    question_id: Joi.string().custom(objectId), // Optional filter by question ID
-    category_id: Joi.string().custom(objectId), // Optional filter by category ID
-    type: Joi.string().valid('next_question', 'product_category'), // Optional filter by type
+    question_id: Joi.string().custom(objectId), 
+    recommendation_id: Joi.string().custom(objectId), 
+    type: Joi.string().valid('next_question', 'product_recommended'), 
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
   }),
@@ -41,14 +41,14 @@ const updateOption = {
   body: Joi.object()
     .keys({
       question_id: Joi.string().custom(objectId),
-      type: Joi.string().valid('next_question', 'product_category'),
+      type: Joi.string().valid('next_question', 'product_recommended'),
       next_question_id: Joi.when('type', {
         is: 'next_question',
         then: Joi.string().custom(objectId),
         otherwise: Joi.forbidden(),
       }),
-      category_id: Joi.when('type', {
-        is: 'product_category',
+      recommendation_id: Joi.when('type', {
+        is: 'product_recommended',
         then: Joi.string().custom(objectId),
         otherwise: Joi.forbidden(),
       }),

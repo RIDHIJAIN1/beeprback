@@ -9,7 +9,8 @@ const { favoriteService } = require('../services');
  */
 const createOrToggleFavourite = catchAsync(async (req, res) => {
   const favourite = await favoriteService.createOrToggleFavourite(req); // Pass the full request object
-  res.status(httpStatus.CREATED).send(favourite);
+
+  res.status(httpStatus.CREATED).send({ data: { favourite }, status: true })
 });
 
 /**
@@ -20,7 +21,8 @@ const getAllFavourites = catchAsync(async (req, res) => {
   const userId = req.userId; // Get userId from the token (via auth middleware)
   const result = await favoriteService.getAllFavourites(userId);
   console.log(`\n\n\n\n ${result} \n\n\n\n`)
-  res.send(result);
+  res.status(httpStatus.OK).send({ data: { result }, status: true })
+
 });
 
 /**
@@ -31,7 +33,7 @@ const getFavourite = catchAsync(async (req, res) => {
   if (!favourite) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Favourite not found');
   }
-  res.send(favourite);
+  res.status(httpStatus.OK).send({ data: { favourite }, status: true })
 });
 
 /**

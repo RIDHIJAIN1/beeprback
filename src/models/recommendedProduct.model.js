@@ -2,16 +2,16 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 // const { required } = require('joi');
 
-const CategoryHaveProductSchema = mongoose.Schema(
+const RecommendedProductSchema = mongoose.Schema(
   {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product', // Reference to the Seller model
       required: true,
     },
-  categoryId: {
+    RecommendationId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category', // Reference to the Seller model
+      ref: 'Recommendation', // Reference to the Seller model
       required: true,
     },
   
@@ -23,11 +23,11 @@ const CategoryHaveProductSchema = mongoose.Schema(
 );
 
 // Add plugin that converts mongoose to json
-CategoryHaveProductSchema.plugin(toJSON);
-CategoryHaveProductSchema.plugin(paginate);
+RecommendedProductSchema.plugin(toJSON);
+RecommendedProductSchema.plugin(paginate);
 
 /**
  * @typedef Product
  */
-const CategoryProduct = mongoose.model('CategoryProduct', CategoryHaveProductSchema);
-module.exports = CategoryProduct;
+const RecommendedProduct = mongoose.model('RecommendedProduct', RecommendedProductSchema);
+module.exports = RecommendedProduct;

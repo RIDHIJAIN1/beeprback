@@ -3,6 +3,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 // const Product = require('../models/product.model');
 const Product = require('../models/product.model');
+const { Category } = require('../models');
 
 /**
  * Create a product
@@ -52,6 +53,9 @@ const queryProducts = async (filter, options) => {
 const getProductsBySellerId = async (sellerId) => {
   return Product.find({ sellerId });
 };
+const getProductsByCategoryId = async (categoryId) => {
+  return Category.find({ categoryId });
+};
 const getProductById = async (id) => {
   return Product.findById(id);
 };
@@ -90,5 +94,6 @@ module.exports = {
   getProductById,
   updateProductById,
   deleteProductById,
-  getProductsBySellerId
+  getProductsBySellerId,
+  getProductsByCategoryId
 };
