@@ -1,42 +1,95 @@
 const httpStatus = require('http-status');
-const { Favourites } = require('../models'); // Import the Favourites model
+const { Favorites, Favorite } = require('../models'); // Import the Favourites model
 const ApiError = require('../utils/ApiError');
-const { User } = require('../models');
-const { Product } = require('../models');
+const { User, Product } = require('../models');
 
 /**
- * Create a favourite
- * @param {Object} favouriteBody
+ * Create or toggle a favourite (like or dislike)
+ * @param {Object} req - Request object containing userId and body
  * @returns {Promise<Favourites>}
  */
-const createFavourite = async (favouriteBody) => {
-  const userExists = await User.findById(favouriteBody.user_id);
-  const productExists = await Product.findById(favouriteBody.product_id);
-  
+const createOrToggleFavourite = async (req) => {
+  const userId = req.userId; // Extract userId from the token (attached by the auth middleware)
+  const { product_id } = req.body;
+
+  const userExists = await User.findById(userId);
+  const productExists = await Product.findById(product_id);
+
   if (!userExists) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  
+
   if (!productExists) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
-  return Favourites.create(favouriteBody);
+  // Check if the favourite already exists
+  const existingFavourite = await Favorite.findOne({ user_id: userId, product_id });
+
+  if (existingFavourite) {
+    existingFavourite.isLiked = !existingFavourite.isLiked;
+    await existingFavourite.save();
+    return existingFavourite;
+  }
+
+  // If it doesn't exist, create a new favourite entry
+  return Favorite.create({ user_id: userId, product_id, isLiked: true });
 };
 
 /**
- * Query for favourites
- * @param {Object} filter - Mongo filter
- * @param {Object} options - Query options
- * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
- * @param {number} [options.limit] - Maximum number of results per page (default = 10)
- * @param {number} [options.page] - Current page (default = 1)
- * @returns {Promise<QueryResult>}
+ * Get all favourites for a user
+ * @param {ObjectId} userId
+ * @returns {Promise<Favourites[]>}
  */
-const queryFavourites = async (filter, options) => {
-  const favourites = await Favourites.paginate(filter, options);
-  return favourites;
+const getAllFavourites = async (userId) => {
+  // Check if userId is provided
+  if (!userId) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Authenticate first');
+  }
+
+  // Use aggregation to join Favorites with Products
+  const favouritesWithProducts = await Favorite.aggregate([
+    {
+      $match: { user_id: userId } // Match favorites for the specific user
+    },
+    {
+      $lookup: {
+        from: 'products', // The name of the Products collection
+        localField: 'product_id', // Field from Favorites
+        foreignField: '_id', // Field from Products
+        as: 'product' // Name of the output array
+      }
+    },
+    {
+      $unwind: {
+        path: '$product', // Unwind the product array to get single product objects
+        preserveNullAndEmptyArrays: true // Keep favorites without products
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        user_id: 1,
+        product_id: 1,
+        isLiked: 1,
+        product: {
+          _id: '$product._id',
+          name: '$product.name',
+          price: '$product.price',
+          description: '$product.description',
+          // Include any other fields you need from the product
+        }
+      }
+    }
+  ]);
+
+  if (!favouritesWithProducts || favouritesWithProducts.length === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No favourites found for this user');
+  }
+
+  return favouritesWithProducts;
 };
+
 
 /**
  * Get favourite by id
@@ -44,29 +97,47 @@ const queryFavourites = async (filter, options) => {
  * @returns {Promise<Favourites>}
  */
 const getFavouriteById = async (id) => {
-  const favourite = await Favourites.findById(id);
-  if (!favourite) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Favourite not found');
-  }
-  return favourite;
-};
+  // Use aggregation to join Favorites with Products
+  const favouriteWithProduct = await Favorite.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(id) } // Match the favorite by ID
+    },
+    {
+      $lookup: {
+        from: 'products', // The name of the Products collection
+        localField: 'product_id', // Field from Favorites
+        foreignField: '_id', // Field from Products
+        as: 'product' // Name of the output array
+      }
+    },
+    {
+      $unwind: {
+        path: '$product', // Unwind the product array to get single product objects
+        preserveNullAndEmptyArrays: true // Optional: Keep the favourite entry if no product is found
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        user_id: 1,
+        product_id: 1,
+        isLiked: 1,
+        product: {
+          _id: '$product._id',
+          name: '$product.name',
+          price: '$product.price',
+          description: '$product.description',
+          // Include any other fields you need from the product
+        }
+      }
+    }
+  ]);
 
-/**
- * Update favourite by id
- * @param {ObjectId} favouriteId
- * @param {Object} updateBody
- * @returns {Promise<Favourites>}
- */
-const updateFavouriteById = async (favouriteId, updateBody) => {
-  const favourite = await getFavouriteById(favouriteId);
-  
-  if (!favourite) {
+  if (!favouriteWithProduct || favouriteWithProduct.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Favourite not found');
   }
-  
-  Object.assign(favourite, updateBody);
-  await favourite.save();
-  return favourite;
+
+  return favouriteWithProduct[0]; // Return the first (and should be the only) entry
 };
 
 /**
@@ -75,48 +146,19 @@ const updateFavouriteById = async (favouriteId, updateBody) => {
  * @returns {Promise<Favourites>}
  */
 const deleteFavouriteById = async (favouriteId) => {
-  const favourite = await getFavouriteById(favouriteId);
-  
+  const favourite = await Favourites.findById(favouriteId);
+
   if (!favourite) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Favourite not found');
   }
-  
+
   await favourite.remove();
   return favourite;
 };
 
-/**
- * Toggle the isLiked status of a favourite
- * @param {ObjectId} favouriteId
- * @returns {Promise<Favourites>}
- */
-const toggleFavourite = async (favouriteId) => {
-  const favourite = await getFavouriteById(favouriteId);
-  
-  if (!favourite) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Favourite not found');
-  }
-  
-  // Toggle the isLiked value
-  favourite.isLiked = !favourite.isLiked;
-  await favourite.save();
-  return favourite;
-};
-
-/**
- * Count favourites
- * @returns {Promise<number>}
- */
-const countFavourites = async () => {
-  return Favourites.countDocuments();
-};
-
 module.exports = {
-  createFavourite,
-  queryFavourites,
+  createOrToggleFavourite,
+  getAllFavourites,
   getFavouriteById,
-  updateFavouriteById,
   deleteFavouriteById,
-  toggleFavourite,
-  countFavourites,
 };

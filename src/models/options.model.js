@@ -21,9 +21,9 @@ const optionSchema = mongoose.Schema(
           return this.type === 'next_question';
         },
       },
-      category_id: {
+      recommendation_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category', // Reference to the category if type is 'product_category'
+        ref: 'Recommendation', // Reference to the category if type is 'product_category'
         required: function() {
           return this.type === 'product_category';
         },

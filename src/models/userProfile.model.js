@@ -9,14 +9,20 @@ const userProfileSchema = mongoose.Schema(
         ref: 'User', // Reference to the Question model kya
         required: true,
       },
-    categoryproduct_id: {
+    recommendedproduct_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Categoryproducts', // Reference to the Question model
+        ref: 'RecommendedProducts', // Reference to the Question model
       
       },
       image: {
         type: String,
-        required: true,
+        default: null
+      },
+
+      bio: {
+        type: String,
+        maxlength: 500, // Limiting the length of the bio
+        default: '', // Optional field with a default empty string
       },
    
   },

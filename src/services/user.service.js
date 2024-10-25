@@ -85,6 +85,20 @@ const updateUserById = async (userId, updateBody) => {
   return user;
 };
 
+
+const updateUserNameById = async (userId, newName) => {
+  const user = await getUserById(userId);
+  console.log(`\n\n\\n\n    ` , user ,`\n\n\\n\n    ` )
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  // Assuming you want to check if the name is already taken
+ 
+  user.name = newName; // Update the name field
+  console.log(`\n\n\\n\n    ` , newName ,`\n\n\\n\n    ` )
+  await user.save();
+  return user;
+};
 /**
  * Delete user by id
  * @param {ObjectId} userId
@@ -108,5 +122,6 @@ module.exports = {
   deleteUserById,
   countUsers,
   countProduct,
+  updateUserNameById
   
 };

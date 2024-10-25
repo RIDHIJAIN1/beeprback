@@ -12,7 +12,8 @@ const createProduct = {
     duplicatePrice: Joi.number().required().min(0), // Weight must be a non-negative number
     qty: Joi.number().required().min(0), // Weight must be a non-negative number
     description: Joi.string().required(),
-    categoryId: Joi.string().required().custom(objectId), // Validate categoryId
+    recommendationId: Joi.string().required().custom(objectId), // Validate recommendationId
+    categoryId: Joi.string().required().custom(objectId), // Validate recommendationId
     // Reference to Seller ID
     // reviews: Joi.array().items(
     //   Joi.object().keys({
@@ -31,8 +32,9 @@ const createProduct = {
 const getProducts = {
   query: Joi.object().keys({
     title: Joi.string(),
-    category: Joi.string(),
+    recommendation: Joi.string(),
     sellerId: Joi.string().custom(objectId),
+    categoryId: Joi.string().custom(objectId),
     id: Joi.string().custom(objectId), // Optional filter by seller ID
   
     limit: Joi.number().integer(),
@@ -44,7 +46,8 @@ const getProduct = {
   params: Joi.object().keys({
      id: Joi.string().custom(objectId).optional(), // Optional productId
     sellerId: Joi.string().custom(objectId).optional(),  // Optional sellerId
-  }).or('productId', 'sellerId')
+    categoryId: Joi.string().custom(objectId).optional(),  // Optional sellerId
+  }).or('productId', 'sellerId', 'categoryId')
 };
 
 const updateProduct = {
@@ -58,6 +61,7 @@ const updateProduct = {
       deliveryOption: Joi.string().valid('standard', 'express', 'overnight'), // Example delivery options
       weight: Joi.number().min(0),
       description: Joi.string(),
+      recommendationId: Joi.string(),
       categoryId: Joi.string(),
       sellerId: Joi.string().custom(objectId), // Optional to update seller ID
       reviews: Joi.array().items(

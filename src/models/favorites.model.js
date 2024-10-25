@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 // const { required } = require('joi');
 
-const Favoriteschema = mongoose.Schema(
+const FavoriteSchema = mongoose.Schema(
   {
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -27,9 +27,9 @@ const Favoriteschema = mongoose.Schema(
 );
 
 // Add plugin that converts mongoose to json
-Favoriteschema.plugin(toJSON);
-Favoriteschema.plugin(paginate);
+FavoriteSchema.plugin(toJSON);
+FavoriteSchema.plugin(paginate);
 
 
-const Favorites = mongoose.model('Favorites', Favoriteschema);
+const Favorites = mongoose.model('Favorites', FavoriteSchema);
 module.exports = Favorites;
